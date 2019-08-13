@@ -1,0 +1,17 @@
+1) Do add below fields to run
+
+add SENTRY_SECRET_KEY in sentry.env
+add GMAIL_USER and GMAIL_PASSWORD in docker-compose.yml
+add dsn in application.py
+
+
+2) Commands to run:
+
+2.1) command to check if config file is right :  docker-compose config
+
+2.2) Command to run migration - docker-compose run --rm sentry-base sentry upgrade --noinput
+
+2.3) Command to create login for sentry :
+ docker-compose exec sentry-base sentry createuser --email YOUR_EMAIL --password YOUR_NEW_PASSWORD --superuser --no-input
+
+2.4) Command to run docker :  docker-compose up -d
