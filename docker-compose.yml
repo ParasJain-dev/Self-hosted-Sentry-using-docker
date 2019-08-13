@@ -1,0 +1,65 @@
+version: '3'
+services:
+  # OPTIONAL: If you want to get emails from sentry include this docker container
+  smtp:
+    image: 'tianon/exim4:latest'
+    environment:
+      GMAIL_USER: ''
+      GMAIL_PASSWORD: ''
+  sentry-base:
+    image: 'sentry:latest'
+    container_name: sentry-base
+    restart: unless-stopped
+    depends_on:
+      - sentry-redis
+      - sentry-postgres
+    links:
+      - sentry-redis
+      - sentry-postgres
+    ports:
+      - 880:9000
+    env_file:
+      - sentry.env
+    volumes:
+      - /Users/parasjain/Desktop/sentry_data/sentry/sentry:/var/lib/sentry/files
+#      - /srv/sentry/etc:/etc/sentry
+# Uncomment the line above if using the GitHub plugin
+  sentry-cron:
+    image: 'sentry:latest'
+    restart: unless-stopped
+    depends_on:
+      - sentry-base
+    links:
+      - sentry-redis
+      - sentry-postgres
+    command: "sentry run cron"
+    env_file:
+      - sentry.env
+    volumes:
+      - /Users/parasjain/Desktop/sentry_data/sentry/sentry:/var/lib/sentry/files
+#      - /srv/sentry/etc:/etc/sentry
+# Uncomment the line above if using the GitHub plugin
+  sentry-worker:
+    image: 'sentry:latest'
+    depends_on:
+      - sentry-base
+    links:
+      - sentry-redis
+      - sentry-postgres
+    command: "sentry run worker"
+    env_file:
+      - sentry.env
+    volumes:
+      - /Users/parasjain/Desktop/sentry_data/sentry/sentry:/var/lib/sentry/files
+#      - /srv/sentry/etc:/etc/sentry
+# Uncomment the line above if using the GitHub plugin
+  sentry-redis:
+    image: 'redis:latest'
+  sentry-postgres:
+    image: 'postgres:latest'
+    environment:
+      POSTGRES_USER: sentry
+      POSTGRES_PASSWORD: sentry
+      POSTGRES_DB: sentry 
+    volumes:
+      - /Users/parasjain/Desktop/sentry_data/sentry/postgres:/var/lib/postgresql/data
